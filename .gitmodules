@@ -4,3 +4,6 @@
 [submodule "mods/plantlife_modpack"]
 	path = mods/plantlife_modpack
 	url = https://github.com/mt-mods/plantlife_modpack.git
+[submodule "mods/oil"]
+	path = mods/oil
+	url = https://github.com/rubenwardy/oil.git
