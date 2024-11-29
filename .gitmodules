@@ -11,5 +11,5 @@
 	path = mods/node_io
 	url = https://github.com/auouymous/node_io.git
 [submodule "mods/minetest_hudbars"]
-	path = mods/minetest_hudbars
+	path = mods/hudbars
 	url = https://codeberg.org/Wuzzy/minetest_hudbars.git
