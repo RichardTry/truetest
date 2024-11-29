@@ -12,6 +12,17 @@ default = {}
 default.LIGHT_MAX = 14
 default.get_translator = S
 
+-- Check for engine features required by MTG
+-- This provides clear error behaviour when MTG is newer than the installed engine
+-- and avoids obscure, hard to debug runtime errors.
+-- This section should be updated before release and older checks can be dropped
+-- when newer ones are introduced.
+if ItemStack("").add_wear_by_uses == nil then
+	error("\nThis version of Minetest Game is incompatible with your engine version "..
+		"(which is too old). You should download a version of Minetest Game that "..
+		"matches the installed engine version.\n")
+end
+
 -- GUI related stuff
 minetest.register_on_joinplayer(function(player)
 	-- Set formspec prepend
@@ -66,3 +77,19 @@ dofile(default_path.."/crafting.lua")
 dofile(default_path.."/mapgen.lua")
 dofile(default_path.."/aliases.lua")
 dofile(default_path.."/legacy.lua")
+
+-- Smoke test that is run via ./util/test/run.sh
+if minetest.settings:get_bool("minetest_game_smoke_test") then
+	minetest.after(0, function()
+		minetest.emerge_area(vector.new(0, 0, 0), vector.new(32, 32, 32))
+		local pos = vector.new(9, 9, 9)
+		local function check()
+			if minetest.get_node(pos).name ~= "ignore" then
+				minetest.request_shutdown()
+				return
+			end
+			minetest.after(0, check)
+		end
+		check()
+	end)
+end

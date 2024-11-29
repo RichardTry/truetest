@@ -92,7 +92,7 @@ minetest.register_tool("fire:flint_and_steel", {
 	on_use = function(itemstack, user, pointed_thing)
 		local sound_pos = pointed_thing.above or user:get_pos()
 		minetest.sound_play("fire_flint_and_steel",
-			{pos = sound_pos, gain = 0.5, max_hear_distance = 8}, true)
+			{pos = sound_pos, gain = 0.2, max_hear_distance = 8}, true)
 		local player_name = user:get_player_name()
 		if pointed_thing.type == "node" then
 			local node_under = minetest.get_node(pointed_thing.under).name
@@ -101,21 +101,25 @@ minetest.register_tool("fire:flint_and_steel", {
 				return
 			end
 			if minetest.is_protected(pointed_thing.under, player_name) then
-				minetest.chat_send_player(player_name, "This area is protected")
+				minetest.record_protection_violation(pointed_thing.under, player_name)
 				return
 			end
 			if nodedef.on_ignite then
 				nodedef.on_ignite(pointed_thing.under, user)
 			elseif minetest.get_item_group(node_under, "flammable") >= 1
 					and minetest.get_node(pointed_thing.above).name == "air" then
+				if minetest.is_protected(pointed_thing.above, player_name) then
+					minetest.record_protection_violation(pointed_thing.above, player_name)
+					return
+				end
+
 				minetest.set_node(pointed_thing.above, {name = "fire:basic_flame"})
 			end
 		end
-		if not (creative and creative.is_enabled_for
-				and creative.is_enabled_for(player_name)) then
+		if not minetest.is_creative_enabled(player_name) then
 			-- Wear tool
 			local wdef = itemstack:get_definition()
-			itemstack:add_wear(1000)
+			itemstack:add_wear_by_uses(66)
 
 			-- Tool break sound
 			if itemstack:get_count() == 0 and wdef.sound and wdef.sound.breaks then

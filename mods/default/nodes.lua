@@ -180,6 +180,9 @@ default:sand_with_kelp
 Corals
 ------
 
+default:coral_green
+default:coral_pink
+default:coral_cyan
 default:coral_brown
 default:coral_orange
 default:coral_skeleton
@@ -214,6 +217,12 @@ default:fence_junglewood
 default:fence_pine_wood
 default:fence_aspen_wood
 
+default:fence_rail_wood
+default:fence_rail_acacia_wood
+default:fence_rail_junglewood
+default:fence_rail_pine_wood
+default:fence_rail_aspen_wood
+
 default:glass
 default:obsidian_glass
 
@@ -221,6 +230,10 @@ default:brick
 
 default:meselamp
 default:mese_post_light
+default:mese_post_light_acacia_wood
+default:mese_post_light_junglewood
+default:mese_post_light_pine_wood
+default:mese_post_light_aspen_wood
 
 Misc
 ----
@@ -656,7 +669,7 @@ minetest.register_node("default:ice", {
 	is_ground_content = false,
 	paramtype = "light",
 	groups = {cracky = 3, cools_lava = 1, slippery = 3},
-	sounds = default.node_sound_glass_defaults(),
+	sounds = default.node_sound_ice_defaults(),
 })
 
 -- Mapgen-placed ice with 'is ground content = true' to contain tunnels
@@ -667,7 +680,7 @@ minetest.register_node("default:cave_ice", {
 	groups = {cracky = 3, cools_lava = 1, slippery = 3,
 		not_in_creative_inventory = 1},
 	drop = "default:ice",
-	sounds = default.node_sound_glass_defaults(),
+	sounds = default.node_sound_ice_defaults(),
 })
 
 --
@@ -739,13 +752,13 @@ minetest.register_node("default:leaves", {
 	special_tiles = {"default_leaves_simple.png"},
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {snappy = 3, leafdecay = 3, flammable = 2, leaves = 1, disable_jump = 1},
+	groups = {snappy = 3, leafdecay = 3, flammable = 2, leaves = 1},
 	drop = {
-		max_items = 2,
+		max_items = 1,
 		items = {
 			{
 				-- player will get sapling with 1/20 chance
-				items = {"default:stick"},
+				items = {"default:sapling"},
 				rarity = 20,
 			},
 			{
@@ -755,13 +768,6 @@ minetest.register_node("default:leaves", {
 			}
 		}
 	},
-	liquid_viscosity = 1,
-	liquidtype = "source",
-	liquid_alternative_flowing = "default:leaves",
-	liquid_alternative_source = "default:leaves",
-	liquid_renewable = false,
-	liquid_range = 0,
-	walkable = false,
 	sounds = default.node_sound_leaves_defaults(),
 
 	after_place_node = after_place_leaves,
@@ -769,39 +775,25 @@ minetest.register_node("default:leaves", {
 
 minetest.register_node("default:apple", {
 	description = S("Apple"),
-	drawtype = "nodebox",
-	tiles = {"default_apple_top.png",
-	         "default_apple_top.png",
-	         "default_apple_side.png",        
-	         "default_apple_side.png",
-	         "default_apple_side.png",
-	         "default_apple_side.png"
-	},
+	drawtype = "plantlike",
+	tiles = {"default_apple.png"},
 	inventory_image = "default_apple.png",
 	paramtype = "light",
 	sunlight_propagates = true,
 	walkable = false,
 	is_ground_content = false,
-	node_box = {
+	selection_box = {
 		type = "fixed",
-		wall_bottom = {
-			{-0.125, -0.5, -0.125, 0.125, -0.25, 0.125},
-		},
-		fixed = {
-			{-0.125, 0.25, -0.125, 0.125, 0.5, 0.125},
-		},
-		wall_side = {
-			{-0.125, -0.5, -0.125, 0.125, -0.25, 0.125},
-		},
+		fixed = {-3 / 16, -7 / 16, -3 / 16, 3 / 16, 4 / 16, 3 / 16}
 	},
 	groups = {fleshy = 3, dig_immediate = 3, flammable = 2,
 		leafdecay = 3, leafdecay_drop = 1, food_apple = 1},
 	on_use = minetest.item_eat(2),
 	sounds = default.node_sound_leaves_defaults(),
 
-	--after_place_node = function(pos, placer, itemstack)
-	--	minetest.set_node(pos, {name = "default:apple", param2 = 1})
-	--end,
+	after_place_node = function(pos, placer, itemstack)
+		minetest.set_node(pos, {name = "default:apple", param2 = 1})
+	end,
 
 	after_dig_node = function(pos, oldnode, oldmetadata, digger)
 		if oldnode.param2 == 0 then
@@ -813,6 +805,8 @@ minetest.register_node("default:apple", {
 
 minetest.register_node("default:apple_mark", {
 	description = S("Apple Marker"),
+	inventory_image = "default_apple.png^default_invisible_node_overlay.png",
+	wield_image = "default_apple.png^default_invisible_node_overlay.png",
 	drawtype = "airlike",
 	paramtype = "light",
 	sunlight_propagates = true,
@@ -864,7 +858,7 @@ minetest.register_node("default:jungleleaves", {
 	special_tiles = {"default_jungleleaves_simple.png"},
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {snappy = 3, leafdecay = 3, flammable = 2, leaves = 1, disable_jump = 1},
+	groups = {snappy = 3, leafdecay = 3, flammable = 2, leaves = 1},
 	drop = {
 		max_items = 1,
 		items = {
@@ -872,14 +866,6 @@ minetest.register_node("default:jungleleaves", {
 			{items = {"default:jungleleaves"}}
 		}
 	},
-	--move_resistance = 0,
-	liquid_viscosity = 1,
-	liquidtype = "source",
-	liquid_alternative_flowing = "default:jungleleaves",
-	liquid_alternative_source = "default:jungleleaves",
-	liquid_renewable = false,
-	liquid_range = 0,
-	walkable = false,
 	sounds = default.node_sound_leaves_defaults(),
 
 	after_place_node = after_place_leaves,
@@ -1464,7 +1450,7 @@ minetest.register_node("default:junglegrass", {
 	sunlight_propagates = true,
 	walkable = false,
 	buildable_to = true,
-	groups = {snappy = 3, flora = 1, attached_node = 1, flammable = 1},
+	groups = {snappy = 3, flora = 1, attached_node = 1, grass = 1, junglegrass = 1, flammable = 1},
 	sounds = default.node_sound_leaves_defaults(),
 	selection_box = {
 		type = "fixed",
@@ -1485,7 +1471,8 @@ minetest.register_node("default:grass_1", {
 	sunlight_propagates = true,
 	walkable = false,
 	buildable_to = true,
-	groups = {snappy = 3, flora = 1, attached_node = 1, grass = 1, flammable = 1},
+	groups = {snappy = 3, flora = 1, attached_node = 1, grass = 1,
+		normal_grass = 1, flammable = 1},
 	sounds = default.node_sound_leaves_defaults(),
 	selection_box = {
 		type = "fixed",
@@ -1499,7 +1486,6 @@ minetest.register_node("default:grass_1", {
 		return ItemStack("default:grass_1 " ..
 			itemstack:get_count() - (1 - ret:get_count()))
 	end,
-	floodable = true
 })
 
 for i = 2, 5 do
@@ -1516,13 +1502,13 @@ for i = 2, 5 do
 		buildable_to = true,
 		drop = "default:grass_1",
 		groups = {snappy = 3, flora = 1, attached_node = 1,
-			not_in_creative_inventory = 1, grass = 1, flammable = 1},
+			not_in_creative_inventory = 1, grass = 1,
+			normal_grass = 1, flammable = 1},
 		sounds = default.node_sound_leaves_defaults(),
 		selection_box = {
 			type = "fixed",
 			fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, -3 / 16, 6 / 16},
 		},
-		floodable = true
 	})
 end
 
@@ -1539,7 +1525,7 @@ minetest.register_node("default:dry_grass_1", {
 	walkable = false,
 	buildable_to = true,
 	groups = {snappy = 3, flammable = 3, flora = 1,
-		attached_node = 1, dry_grass = 1},
+		attached_node = 1, grass = 1, dry_grass = 1},
 	sounds = default.node_sound_leaves_defaults(),
 	selection_box = {
 		type = "fixed",
@@ -1568,7 +1554,7 @@ for i = 2, 5 do
 		walkable = false,
 		buildable_to = true,
 		groups = {snappy = 3, flammable = 3, flora = 1, attached_node = 1,
-			not_in_creative_inventory=1, dry_grass = 1},
+			not_in_creative_inventory = 1, grass = 1, dry_grass = 1},
 		drop = "default:dry_grass_1",
 		sounds = default.node_sound_leaves_defaults(),
 		selection_box = {
@@ -1590,7 +1576,8 @@ minetest.register_node("default:fern_1", {
 	sunlight_propagates = true,
 	walkable = false,
 	buildable_to = true,
-	groups = {snappy = 3, flammable = 3, flora = 1, attached_node = 1},
+	groups = {snappy = 3, flammable = 3, flora = 1, grass = 1,
+		fern = 1, attached_node = 1},
 	sounds = default.node_sound_leaves_defaults(),
 	selection_box = {
 		type = "fixed",
@@ -1620,7 +1607,7 @@ for i = 2, 3 do
 		walkable = false,
 		buildable_to = true,
 		groups = {snappy = 3, flammable = 3, flora = 1, attached_node = 1,
-			not_in_creative_inventory=1},
+			grass = 1, fern = 1, not_in_creative_inventory = 1},
 		drop = "default:fern_1",
 		sounds = default.node_sound_leaves_defaults(),
 		selection_box = {
@@ -1642,7 +1629,8 @@ minetest.register_node("default:marram_grass_1", {
 	sunlight_propagates = true,
 	walkable = false,
 	buildable_to = true,
-	groups = {snappy = 3, flammable = 3, attached_node = 1},
+	groups = {snappy = 3, flammable = 3, flora = 1, grass = 1, marram_grass = 1,
+		attached_node = 1},
 	sounds = default.node_sound_leaves_defaults(),
 	selection_box = {
 		type = "fixed",
@@ -1670,8 +1658,8 @@ for i = 2, 3 do
 		sunlight_propagates = true,
 		walkable = false,
 		buildable_to = true,
-		groups = {snappy = 3, flammable = 3, attached_node = 1,
-			not_in_creative_inventory=1},
+		groups = {snappy = 3, flammable = 3, flora = 1, attached_node = 1,
+			grass = 1, marram_grass = 1, not_in_creative_inventory = 1},
 		drop = "default:marram_grass_1",
 		sounds = default.node_sound_leaves_defaults(),
 		selection_box = {
@@ -1702,7 +1690,6 @@ minetest.register_node("default:bush_stem", {
 minetest.register_node("default:bush_leaves", {
 	description = S("Bush Leaves"),
 	drawtype = "allfaces_optional",
-	waving = 1,
 	tiles = {"default_leaves_simple.png"},
 	paramtype = "light",
 	groups = {snappy = 3, flammable = 2, leaves = 1},
@@ -1756,7 +1743,6 @@ minetest.register_node("default:bush_sapling", {
 minetest.register_node("default:blueberry_bush_leaves_with_berries", {
 	description = S("Blueberry Bush Leaves with Berries"),
 	drawtype = "allfaces_optional",
-	waving = 1,
 	tiles = {"default_blueberry_bush_leaves.png^default_blueberry_overlay.png"},
 	paramtype = "light",
 	groups = {snappy = 3, flammable = 2, leaves = 1, dig_immediate = 3},
@@ -1773,7 +1759,6 @@ minetest.register_node("default:blueberry_bush_leaves_with_berries", {
 minetest.register_node("default:blueberry_bush_leaves", {
 	description = S("Blueberry Bush Leaves"),
 	drawtype = "allfaces_optional",
-	waving = 1,
 	tiles = {"default_blueberry_bush_leaves.png"},
 	paramtype = "light",
 	groups = {snappy = 3, flammable = 2, leaves = 1},
@@ -1852,7 +1837,6 @@ minetest.register_node("default:acacia_bush_stem", {
 minetest.register_node("default:acacia_bush_leaves", {
 	description = S("Acacia Bush Leaves"),
 	drawtype = "allfaces_optional",
-	waving = 1,
 	tiles = {"default_acacia_leaves_simple.png"},
 	paramtype = "light",
 	groups = {snappy = 3, flammable = 2, leaves = 1},
@@ -1923,7 +1907,6 @@ minetest.register_node("default:pine_bush_stem", {
 minetest.register_node("default:pine_bush_needles", {
 	description = S("Pine Bush Needles"),
 	drawtype = "allfaces_optional",
-	waving = 1,
 	tiles = {"default_pine_needles.png"},
 	paramtype = "light",
 	groups = {snappy = 3, flammable = 2, leaves = 1},
@@ -1974,6 +1957,7 @@ minetest.register_node("default:pine_bush_sapling", {
 	end,
 })
 
+
 minetest.register_node("default:sand_with_kelp", {
 	description = S("Kelp"),
 	drawtype = "plantlike_rooted",
@@ -1981,6 +1965,7 @@ minetest.register_node("default:sand_with_kelp", {
 	tiles = {"default_sand.png"},
 	special_tiles = {{name = "default_kelp.png", tileable_vertical = true}},
 	inventory_image = "default_kelp.png",
+	wield_image = "default_kelp.png",
 	paramtype = "light",
 	paramtype2 = "leveled",
 	groups = {snappy = 3},
@@ -2000,8 +1985,8 @@ minetest.register_node("default:sand_with_kelp", {
 
 	on_place = function(itemstack, placer, pointed_thing)
 		-- Call on_rightclick if the pointed node defines it
-		if pointed_thing.type == "node" and placer and
-				not placer:get_player_control().sneak then
+		if pointed_thing.type == "node" and not (placer and placer:is_player()
+				and placer:get_player_control().sneak) then
 			local node_ptu = minetest.get_node(pointed_thing.under)
 			local def_ptu = minetest.registered_nodes[node_ptu.name]
 			if def_ptu and def_ptu.on_rightclick then
@@ -2027,8 +2012,7 @@ minetest.register_node("default:sand_with_kelp", {
 					not minetest.is_protected(pos_top, player_name) then
 				minetest.set_node(pos, {name = "default:sand_with_kelp",
 					param2 = height * 16})
-				if not (creative and creative.is_enabled_for
-						and creative.is_enabled_for(player_name)) then
+				if not minetest.is_creative_enabled(player_name) then
 					itemstack:take_item()
 				end
 			else
@@ -2040,7 +2024,7 @@ minetest.register_node("default:sand_with_kelp", {
 		return itemstack
 	end,
 
-	after_destruct  = function(pos, oldnode)
+	after_dig_node = function(pos, oldnode, oldmetadata, digger)
 		minetest.set_node(pos, {name = "default:sand"})
 	end
 })
@@ -2051,19 +2035,20 @@ minetest.register_node("default:sand_with_kelp", {
 --
 
 local function coral_on_place(itemstack, placer, pointed_thing)
-	if pointed_thing.type ~= "node" or not placer then
+	if pointed_thing.type ~= "node" then
 		return itemstack
 	end
 
-	local player_name = placer:get_player_name()
+	local player_name = placer and placer:get_player_name()
 	local pos_under = pointed_thing.under
 	local pos_above = pointed_thing.above
 	local node_under = minetest.get_node(pos_under)
 	local def_under = minetest.registered_nodes[node_under.name]
 
-	if def_under and def_under.on_rightclick and not placer:get_player_control().sneak then
+	if def_under and def_under.on_rightclick and not (
+		placer and placer:is_player() and placer:get_player_control().sneak) then
 		return def_under.on_rightclick(pos_under, node_under,
-				placer, itemstack, pointed_thing) or itemstack
+				placer, itemstack, pointed_thing)
 	end
 
 	if node_under.name ~= "default:coral_skeleton" or
@@ -2073,17 +2058,13 @@ local function coral_on_place(itemstack, placer, pointed_thing)
 
 	if minetest.is_protected(pos_under, player_name) or
 			minetest.is_protected(pos_above, player_name) then
-		minetest.log("action", player_name
-			.. " tried to place " .. itemstack:get_name()
-			.. " at protected position "
-			.. minetest.pos_to_string(pos_under))
 		minetest.record_protection_violation(pos_under, player_name)
 		return itemstack
 	end
 
 	node_under.name = itemstack:get_name()
 	minetest.set_node(pos_under, node_under)
-	if not (creative and creative.is_enabled_for(player_name)) then
+	if not minetest.is_creative_enabled(player_name) then
 		itemstack:take_item()
 	end
 
@@ -2098,6 +2079,7 @@ minetest.register_node("default:coral_green", {
 	tiles = {"default_coral_skeleton.png"},
 	special_tiles = {{name = "default_coral_green.png", tileable_vertical = true}},
 	inventory_image = "default_coral_green.png",
+	wield_image = "default_coral_green.png",
 	groups = {snappy = 3},
 	selection_box = {
 		type = "fixed",
@@ -2115,7 +2097,7 @@ minetest.register_node("default:coral_green", {
 
 	on_place = coral_on_place,
 
-	after_destruct  = function(pos, oldnode)
+	after_dig_node = function(pos, oldnode, oldmetadata, digger)
 		minetest.set_node(pos, {name = "default:coral_skeleton"})
 	end,
 })
@@ -2128,6 +2110,7 @@ minetest.register_node("default:coral_pink", {
 	tiles = {"default_coral_skeleton.png"},
 	special_tiles = {{name = "default_coral_pink.png", tileable_vertical = true}},
 	inventory_image = "default_coral_pink.png",
+	wield_image = "default_coral_pink.png",
 	groups = {snappy = 3},
 	selection_box = {
 		type = "fixed",
@@ -2145,7 +2128,7 @@ minetest.register_node("default:coral_pink", {
 
 	on_place = coral_on_place,
 
-	after_destruct  = function(pos, oldnode)
+	after_dig_node = function(pos, oldnode, oldmetadata, digger)
 		minetest.set_node(pos, {name = "default:coral_skeleton"})
 	end,
 })
@@ -2158,6 +2141,7 @@ minetest.register_node("default:coral_cyan", {
 	tiles = {"default_coral_skeleton.png"},
 	special_tiles = {{name = "default_coral_cyan.png", tileable_vertical = true}},
 	inventory_image = "default_coral_cyan.png",
+	wield_image = "default_coral_cyan.png",
 	groups = {snappy = 3},
 	selection_box = {
 		type = "fixed",
@@ -2175,7 +2159,7 @@ minetest.register_node("default:coral_cyan", {
 
 	on_place = coral_on_place,
 
-	after_destruct  = function(pos, oldnode)
+	after_dig_node = function(pos, oldnode, oldmetadata, digger)
 		minetest.set_node(pos, {name = "default:coral_skeleton"})
 	end,
 })
@@ -2234,7 +2218,7 @@ minetest.register_node("default:water_source", {
 			},
 		},
 	},
-	alpha = 191,
+	use_texture_alpha = "blend",
 	paramtype = "light",
 	walkable = false,
 	pointable = false,
@@ -2279,7 +2263,7 @@ minetest.register_node("default:water_flowing", {
 			},
 		},
 	},
-	alpha = 191,
+	use_texture_alpha = "blend",
 	paramtype = "light",
 	paramtype2 = "flowingliquid",
 	walkable = false,
@@ -2325,7 +2309,7 @@ minetest.register_node("default:river_water_source", {
 			},
 		},
 	},
-	alpha = 160,
+	use_texture_alpha = "blend",
 	paramtype = "light",
 	walkable = false,
 	pointable = false,
@@ -2375,7 +2359,7 @@ minetest.register_node("default:river_water_flowing", {
 			},
 		},
 	},
-	alpha = 160,
+	use_texture_alpha = "blend",
 	paramtype = "light",
 	paramtype2 = "flowingliquid",
 	walkable = false,
@@ -2493,53 +2477,6 @@ minetest.register_node("default:lava_flowing", {
 -- Tools / "Advanced" crafting / Non-"natural"
 --
 
-minetest.register_node("default:twig", {
-	description = S("Twig"),
-	inventory_image = "default_twig.png",
-	wield_image = "default_twig.png",
-	drawtype = "nodebox",
-	tiles = {
-		"default_twig.png",
-		"default_twig.png^[transformFY", -- mirror
-		"default_empty.png" -- empty
-	},
-	paramtype = "light",
-	paramtype2 = "facedir",
-	walkable = false,
-	sunlight_propagates = true,
-	buildable_to = true,
-	node_box = {type = "fixed", fixed = {-1/2, -1/2, -1/2, 1/2, -7/16, 1/2}},
-	groups = {
-		choppy=2,
-		oddly_breakable_by_hand=2,
-		flammable=3,
-		attached_node=1,
-		--not_in_creative_inventory=iNV
-	},
-	drop = "default:twig",
-	sounds = default.node_sound_leaves_defaults(),
-	liquids_pointable = true,
-	--[[on_place = function(itemstack, placer, pointed_thing)
-		local pt = pointed_thing
-
-		if not placer then return end
-		local playername = placer:get_player_name()
-		if minetest.is_protected(pt.above, playername) then 
-			minetest.record_protection_violation(pt.above, playername)
-			return
-		end
-
-		local direction = minetest.dir_to_facedir(placer:get_look_dir())
-		if minetest.get_node(pt.above).name=="air" then
-			minetest.swap_node(pt.above, {name="trunks:twig_"..math.random(1,4), param2=direction})
-			if not minetest.setting_getbool("creative_mode") then
-				itemstack:take_item()
-			end
-			return itemstack
-		end
-	end]]
-})
-
 local bookshelf_formspec =
 	"size[8,7;]" ..
 	"list[context;books;0,0.3;8,2;]" ..
@@ -2585,7 +2522,7 @@ local function update_bookshelf(pos)
 	end
 end
 
-minetest.register_node("default:bookshelf", {
+local default_bookshelf_def = {
 	description = S("Bookshelf"),
 	tiles = {"default_wood.png", "default_wood.png", "default_wood.png",
 		"default_wood.png", "default_bookshelf.png", "default_bookshelf.png"},
@@ -2610,19 +2547,13 @@ minetest.register_node("default:bookshelf", {
 		end
 		return 0
 	end,
-	on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
-		minetest.log("action", player:get_player_name() ..
-			" moves stuff in bookshelf at " .. minetest.pos_to_string(pos))
+	on_metadata_inventory_put = function(pos)
 		update_bookshelf(pos)
 	end,
-	on_metadata_inventory_put = function(pos, listname, index, stack, player)
-		minetest.log("action", player:get_player_name() ..
-			" puts stuff to bookshelf at " .. minetest.pos_to_string(pos))
+	on_metadata_inventory_take = function(pos)
 		update_bookshelf(pos)
 	end,
-	on_metadata_inventory_take = function(pos, listname, index, stack, player)
-		minetest.log("action", player:get_player_name() ..
-			" takes stuff from bookshelf at " .. minetest.pos_to_string(pos))
+	on_metadata_inventory_move = function(pos)
 		update_bookshelf(pos)
 	end,
 	on_blast = function(pos)
@@ -2632,7 +2563,9 @@ minetest.register_node("default:bookshelf", {
 		minetest.remove_node(pos)
 		return drops
 	end,
-})
+}
+default.set_inventory_action_loggers(default_bookshelf_def, "bookshelf")
+minetest.register_node("default:bookshelf", default_bookshelf_def)
 
 local function register_sign(material, desc, def)
 	minetest.register_node("default:sign_wall_" .. material, {
@@ -2646,6 +2579,7 @@ local function register_sign(material, desc, def)
 		sunlight_propagates = true,
 		is_ground_content = false,
 		walkable = false,
+		use_texture_alpha = "opaque",
 		node_box = {
 			type = "wallmounted",
 			wall_top    = {-0.4375, 0.4375, -0.3125, 0.4375, 0.5, 0.3125},
@@ -2670,12 +2604,12 @@ local function register_sign(material, desc, def)
 			if not text then
 				return
 			end
-			if string.len(text) > 512 then
+			if #text > 512 then
 				minetest.chat_send_player(player_name, S("Text too long"))
 				return
 			end
-			minetest.log("action", player_name .. " wrote \"" .. text ..
-				"\" to the sign at " .. minetest.pos_to_string(pos))
+			text = text:gsub("[%z-\8\11-\31\127]", "") -- strip naughty control characters (keeps \t and \n)
+			default.log_player_action(sender, ("wrote %q to the sign at"):format(text), pos)
 			local meta = minetest.get_meta(pos)
 			meta:set_string("text", text)
 
@@ -2705,7 +2639,7 @@ minetest.register_node("default:ladder_wood", {
 	inventory_image = "default_ladder_wood.png",
 	wield_image = "default_ladder_wood.png",
 	paramtype = "light",
-	--paramtype2 = "wallmounted",
+	paramtype2 = "wallmounted",
 	sunlight_propagates = true,
 	walkable = false,
 	climbable = true,
@@ -2716,7 +2650,7 @@ minetest.register_node("default:ladder_wood", {
 		--wall_bottom = = <default>
 		--wall_side = = <default>
 	},
-	groups = {choppy = 2, oddly_breakable_by_hand = 3, flammable = 2, attached_node = 1},
+	groups = {choppy = 2, oddly_breakable_by_hand = 3, flammable = 2},
 	legacy_wallmounted = true,
 	sounds = default.node_sound_wood_defaults(),
 })
@@ -2739,7 +2673,7 @@ minetest.register_node("default:ladder_steel", {
 		--wall_bottom = = <default>
 		--wall_side = = <default>
 	},
-	groups = {cracky = 2, attached_node = 1},
+	groups = {cracky = 2},
 	sounds = default.node_sound_metal_defaults(),
 })
 
@@ -2867,8 +2801,8 @@ minetest.register_node("default:glass", {
 	description = S("Glass"),
 	drawtype = "glasslike_framed_optional",
 	tiles = {"default_glass.png", "default_glass_detail.png"},
+	use_texture_alpha = "clip", -- only needed for stairs API
 	paramtype = "light",
-	paramtype2 = "glasslikeliquidlevel",
 	sunlight_propagates = true,
 	is_ground_content = false,
 	groups = {cracky = 3, oddly_breakable_by_hand = 3},
@@ -2879,8 +2813,8 @@ minetest.register_node("default:obsidian_glass", {
 	description = S("Obsidian Glass"),
 	drawtype = "glasslike_framed_optional",
 	tiles = {"default_obsidian_glass.png", "default_obsidian_glass_detail.png"},
+	use_texture_alpha = "clip", -- only needed for stairs API
 	paramtype = "light",
-	paramtype2 = "glasslikeliquidlevel",
 	is_ground_content = false,
 	sunlight_propagates = true,
 	sounds = default.node_sound_glass_defaults(),
@@ -2914,25 +2848,34 @@ minetest.register_node("default:meselamp", {
 	light_source = default.LIGHT_MAX,
 })
 
-minetest.register_node("default:mese_post_light", {
-	description = S("Mese Post Light"),
-	tiles = {"default_mese_post_light_top.png", "default_mese_post_light_top.png",
-		"default_mese_post_light_side_dark.png", "default_mese_post_light_side_dark.png",
-		"default_mese_post_light_side.png", "default_mese_post_light_side.png"},
-	wield_image = "default_mese_post_light_side.png",
-	drawtype = "nodebox",
-	node_box = {
-		type = "fixed",
-		fixed = {
-			{-2 / 16, -8 / 16, -2 / 16, 2 / 16, 8 / 16, 2 / 16},
-		},
-	},
-	paramtype = "light",
-	light_source = default.LIGHT_MAX,
-	sunlight_propagates = true,
-	is_ground_content = false,
-	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
-	sounds = default.node_sound_wood_defaults(),
+default.register_mesepost("default:mese_post_light", {
+	description = S("Apple Wood Mese Post Light"),
+	texture = "default_fence_wood.png",
+	material = "default:wood",
+})
+
+default.register_mesepost("default:mese_post_light_acacia_wood", {
+	description = S("Acacia Wood Mese Post Light"),
+	texture = "default_fence_acacia_wood.png",
+	material = "default:acacia_wood",
+})
+
+default.register_mesepost("default:mese_post_light_junglewood", {
+	description = S("Jungle Wood Mese Post Light"),
+	texture = "default_fence_junglewood.png",
+	material = "default:junglewood",
+})
+
+default.register_mesepost("default:mese_post_light_pine_wood", {
+	description = S("Pine Wood Mese Post Light"),
+	texture = "default_fence_pine_wood.png",
+	material = "default:pine_wood",
+})
+
+default.register_mesepost("default:mese_post_light_aspen_wood", {
+	description = S("Aspen Wood Mese Post Light"),
+	texture = "default_fence_aspen_wood.png",
+	material = "default:aspen_wood",
 })
 
 --

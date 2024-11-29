@@ -1,5 +1,10 @@
-
-local reverse = true
+-- Removes a node without calling on on_destruct()
+-- We use this to mess with bed nodes without causing unwanted recursion.
+local function remove_no_destruct(pos)
+	minetest.swap_node(pos, {name = "air"})
+	minetest.remove_node(pos) -- Now clear the meta
+	minetest.check_for_falling(pos)
+end
 
 local function destruct_bed(pos, n)
 	local node = minetest.get_node(pos)
@@ -12,13 +17,11 @@ local function destruct_bed(pos, n)
 		local dir = minetest.facedir_to_dir(node.param2)
 		other = vector.add(pos, dir)
 	end
-
-	if reverse then
-		reverse = not reverse
-		minetest.remove_node(other)
-		minetest.check_for_falling(other)
-	else
-		reverse = not reverse
+	local oname = minetest.get_node(other).name
+	if minetest.get_item_group(oname, "bed") ~= 0 then
+	   remove_no_destruct(other)
+	   beds.remove_spawns_at(pos)
+	   beds.remove_spawns_at(other)
 	end
 end
 
@@ -29,6 +32,7 @@ function beds.register_bed(name, def)
 		wield_image = def.wield_image,
 		drawtype = "nodebox",
 		tiles = def.tiles.bottom,
+		use_texture_alpha = "clip",
 		paramtype = "light",
 		paramtype2 = "facedir",
 		is_ground_content = false,
@@ -93,8 +97,7 @@ function beds.register_bed(name, def)
 			minetest.set_node(pos, {name = name .. "_bottom", param2 = dir})
 			minetest.set_node(botpos, {name = name .. "_top", param2 = dir})
 
-			if not (creative and creative.is_enabled_for
-					and creative.is_enabled_for(player_name)) then
+			if not minetest.is_creative_enabled(player_name) then
 				itemstack:take_item()
 			end
 			return itemstack
@@ -111,10 +114,11 @@ function beds.register_bed(name, def)
 
 		on_rotate = function(pos, node, user, _, new_param2)
 			local dir = minetest.facedir_to_dir(node.param2)
+			-- old position of the top node
 			local p = vector.add(pos, dir)
 			local node2 = minetest.get_node_or_nil(p)
-			if not node2 or not minetest.get_item_group(node2.name, "bed") == 2 or
-					not node.param2 == node2.param2 then
+			if not node2 or minetest.get_item_group(node2.name, "bed") ~= 2 or
+					node.param2 ~= node2.param2 then
 				return false
 			end
 			if minetest.is_protected(p, user:get_player_name()) then
@@ -124,6 +128,7 @@ function beds.register_bed(name, def)
 			if new_param2 % 32 > 3 then
 				return false
 			end
+			-- new position of the top node
 			local newp = vector.add(pos, minetest.facedir_to_dir(new_param2))
 			local node3 = minetest.get_node_or_nil(newp)
 			local node_def = node3 and minetest.registered_nodes[node3.name]
@@ -135,8 +140,7 @@ function beds.register_bed(name, def)
 				return false
 			end
 			node.param2 = new_param2
-			-- do not remove_node here - it will trigger destroy_bed()
-			minetest.set_node(p, {name = "air"})
+			remove_no_destruct(p)
 			minetest.set_node(pos, node)
 			minetest.set_node(newp, {name = name .. "_top", param2 = new_param2})
 			return true
@@ -149,11 +153,13 @@ function beds.register_bed(name, def)
 	minetest.register_node(name .. "_top", {
 		drawtype = "nodebox",
 		tiles = def.tiles.top,
+		use_texture_alpha = "clip",
 		paramtype = "light",
 		paramtype2 = "facedir",
 		is_ground_content = false,
 		pointable = false,
-		groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 3, bed = 2},
+		groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 3, bed = 2,
+				not_in_creative_inventory = 1},
 		sounds = def.sounds or default.node_sound_wood_defaults(),
 		drop = name .. "_bottom",
 		node_box = {
