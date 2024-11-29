@@ -1,0 +1,6 @@
+[submodule "mods/ingots"]
+	path = mods/ingots
+	url = https://github.com/Skamiz/ingots.git
+[submodule "mods/plantlife_modpack"]
+	path = mods/plantlife_modpack
+	url = https://github.com/mt-mods/plantlife_modpack.git
