@@ -13,3 +13,6 @@
 [submodule "mods/minetest_hudbars"]
 	path = mods/hudbars
 	url = https://codeberg.org/Wuzzy/minetest_hudbars.git
+[submodule "mods/living_trees"]
+	path = mods/living_trees
+	url = https://github.com/RichardTry/living_trees.git
